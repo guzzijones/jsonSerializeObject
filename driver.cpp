@@ -1,5 +1,6 @@
 #include <iostream>
 #include "json.h"
+#include <vector>
 class iJsonSerializable{
    
 
@@ -31,6 +32,7 @@ class testClassA:public iJsonSerializable{
    double _testDouble;
    std::string _testString;
    bool _testBool;
+   std::vector<std::string> _testStringsV;
    private:
 
 
@@ -41,6 +43,9 @@ void testClassA::serialize(Json::Value& root){
    root["testDouble"]=_testDouble;
    root["testString"]=_testString;
    root["testBool"]=_testBool;
+   for(std::vector<std::string>::const_iterator it = _testStringsV.begin();it!=_testStringsV.end();it++){
+      root["testStringsV"].append((*it));
+   }
 
 }
 void testClassA::deSerialize(Json::Value& root){
@@ -48,6 +53,13 @@ void testClassA::deSerialize(Json::Value& root){
    _testDouble=root.get("testDouble",0.0).asDouble();
    _testString=root.get("testString","").asString();
    _testBool=root.get("testBool",false).asBool();
+   if(root.get("testStringsV","").isArray()){
+      int size=root.get("vector","").size();
+      for(int i=0;i<size;i++){
+         _testStringsV.push_back(root.get("testStringsV","")[i].asString());
+      }
+
+   }
 
 }
 
