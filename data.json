@@ -1,0 +1,6 @@
+{
+"testboolA" : true,
+"testfloatA" : 3.14159,
+"testintA" : 42,
+"teststringA" : "foo"
+}
