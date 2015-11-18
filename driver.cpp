@@ -37,7 +37,23 @@ class testClassA:public iJsonSerializable{
 
 
 };
-
+class testSubClassA:public testClassA{
+   public:
+   testSubClassA(void){};
+   virtual ~testSubClassA(void){};
+   virtual void serialize(Json::Value& root);
+   virtual void deSerialize(Json::Value& root);
+   
+   double _testSubADouble;
+};
+void testSubClassA::serialize(Json::Value& root){
+   testClassA::serialize(root);
+   root["testSubADouble"]=_testSubADouble;
+}
+void testSubClassA::deSerialize(Json::Value& root){
+   _testSubADouble=root.get("testSubADouble",0.0).asDouble();
+   this->testClassA::deSerialize(root);
+}
 void testClassA::serialize(Json::Value& root){
    root["testInt"]=_testInt;
    root["testDouble"]=_testDouble;
@@ -90,6 +106,19 @@ bool cJsonSerializer::deSerialize(iJsonSerializable * obj, std::string & input){
 }
 
 int main(){
+   testSubClassA mySubTest;
+   std::string inputDerived = "{ \"testInt\" : 42, \"testDouble\" : 3.14159, \"testString\" : \"foo\", \"testBool\" : true,\"testSubADouble\" : 55.55 }\n";
+   cJsonSerializer::deSerialize(&mySubTest,inputDerived);
+   std::cout << "raw input: " << inputDerived << std::endl;
+   std::cout << "Sub: loaded value for int: " << mySubTest._testInt << std::endl;
+   std::cout << "Sub: loaded value for double: " << mySubTest._testDouble << std::endl;
+   std::cout << "Sub: loaded value for String: " << mySubTest._testString << std::endl;
+   std::cout << "Sub: loaded value for bool: " << mySubTest._testBool<< std::endl;
+   std::cout << "Sub: loaded value for SubDouble: " << mySubTest._testSubADouble<< std::endl;
+   std::string outputDerived;
+   cJsonSerializer::serialize(&mySubTest,outputDerived);
+   std::cout << "Sub: serialized object: " << outputDerived << std::endl;
+
    testClassA myTest;
    std::string input = "{ \"testInt\" : 42, \"testDouble\" : 3.14159, \"testString\" : \"foo\", \"testBool\" : true }\n";
    cJsonSerializer::deSerialize(&myTest,input);
